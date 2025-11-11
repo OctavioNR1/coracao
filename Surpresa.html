@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Um coração pra você 💗</title>
+  <style>
+    :root{
+      --bg:#fff6fb;
+      --heart:#ff4d86;
+      --shadow: rgba(255,77,134,0.25);
+      --text:#2b2b2b;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,var(--bg), #fff);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:18px;
+      padding:30px;
+      box-sizing:border-box;
+    }
+
+    .card{
+      background: white;
+      border-radius:18px;
+      padding:28px 36px;
+      box-shadow: 0 10px 30px -10px var(--shadow);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:18px;
+      max-width:420px;
+      text-align:center;
+    }
+
+    .heart-btn{
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      padding:0;
+      outline:none;
+      border-radius:50%;
+      transform-origin:center;
+      transition:transform 160ms cubic-bezier(.2,.9,.3,1);
+    }
+
+    /* SVG size */
+    .heart-svg{
+      width:160px;
+      height:160px;
+      display:block;
+      filter: drop-shadow(0 12px 18px var(--shadow));
+    }
+
+    /* pop animation when clicked */
+    .heart-btn:active{ transform: scale(0.98); }
+
+    /* pulse class applied after click */
+    .pulsing{
+      animation: pulse 900ms ease-out;
+    }
+    @keyframes pulse{
+      0%{ transform: scale(1); filter: drop-shadow(0 12px 18px var(--shadow)); }
+      40%{ transform: scale(1.12); }
+      100%{ transform: scale(1); filter: drop-shadow(0 26px 32px rgba(255,77,134,0.24)); }
+    }
+
+    .msg{
+      font-size:18px;
+      color: #555;
+    }
+
+    /* modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,0.28);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:1000;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 180ms;
+    }
+    .modal-backdrop.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .modal{
+      background: white;
+      padding:24px 28px;
+      border-radius:14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+      text-align:center;
+      min-width:240px;
+    }
+    .modal h2{
+      margin:0 0 8px 0;
+      font-size:20px;
+      color:var(--text);
+    }
+    .modal p{
+      margin:0 0 16px 0;
+      font-size:16px;
+      color:#666;
+    }
+    .btn{
+      background:var(--heart);
+      color:white;
+      border:0;
+      padding:10px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .small-note{
+      font-size:12px;
+      color:#aaa;
+      margin-top:8px;
+    }
+
+    @media (max-width:420px){
+      .heart-svg{ width:120px; height:120px; }
+      .card{ padding:20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="article" aria-label="Cartão com coração">
+      <button class="heart-btn" id="heartBtn" aria-label="Clicar para mensagem de carinho">
+        <!-- SVG heart -->
+        <svg class="heart-svg" viewBox="0 0 32 29" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#ff7aa8"/>
+              <stop offset="1" stop-color="#ff4d86"/>
+            </linearGradient>
+          </defs>
+          <path id="heartPath"
+            d="M23.6 2c-2.6 0-4.9 1.6-6 3.8C16.3 3.6 13.9 2 11.4 2 7 2 4 5.4 4 9.6c0 5.3 5.5 9.3 11 14.2 1.1.9 2.7.9 3.8 0 5.5-4.9 11-8.9 11-14.2C30 5.4 27 2 23.6 2z"
+            fill="url(#g)"/>
+        </svg>
+      </button>
+      <div class="msg">Um pequeno gesto — clique no coração ❤️</div>
+      <div class="small-note">Vai mostrar uma mensagem doce ✨</div>
+    </div>
+  </div>
+
+  <!-- modal (inicialmente escondido) -->
+  <div id="backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <h2 id="modalTitle"> Te adoro carinõ </h2>
+      <p id="modalSub">Queria te lembrar disso agora mesmo 💖</p>
+      <button class="btn" id="closeBtn">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    const heartBtn = document.getElementById('heartBtn');
+    const backdrop = document.getElementById('backdrop');
+    const closeBtn = document.getElementById('closeBtn');
+
+    // Se desejar, personalize a mensagem aqui:
+    const mainMessage = "Te adoro carinõ";
+    const subMessage = "Queria te lembrar disso agora mesmo 💖";
+
+    heartBtn.addEventListener('click', () => {
+      // pequeno efeito
+      heartBtn.classList.remove('pulsing');
+      // força reflow para reiniciar animação
+      void heartBtn.offsetWidth;
+      heartBtn.classList.add('pulsing');
+
+      // mostra modal com texto
+      document.getElementById('modalTitle').textContent = mainMessage;
+      document.getElementById('modalSub').textContent = subMessage;
+
+      backdrop.classList.add('show');
+      backdrop.setAttribute('aria-hidden','false');
+    });
+
+    closeBtn.addEventListener('click', () => {
+      backdrop.classList.remove('show');
+      backdrop.setAttribute('aria-hidden','true');
+    });
+
+    // fechar clicando fora do modal
+    backdrop.addEventListener('click', (e) => {
+      if(e.target === backdrop) {
+        backdrop.classList.remove('show');
+        backdrop.setAttribute('aria-hidden','true');
+      }
+    });
+
+    // fechar com Esc
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape' && backdrop.classList.contains('show')) {
+        backdrop.classList.remove('show');
+        backdrop.setAttribute('aria-hidden','true');
+      }
+    });
+  </script>
+</body>
+</html>
